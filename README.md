@@ -30,5 +30,6 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ### Let's go (developer)
 
+- Read [config](./src/main/scala/de/maxbundscherer/metadata/extractor/utils/Configuration.scala)
 - Run with ``sbt run``
 - Triggered Restart (recommend) ``sbt ~reStart``
