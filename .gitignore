@@ -1,0 +1,5 @@
+target/
+.idea/
+.bsp/
+.java-version
+workDir/
