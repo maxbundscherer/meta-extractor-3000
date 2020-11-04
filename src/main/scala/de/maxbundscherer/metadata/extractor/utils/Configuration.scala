@@ -4,7 +4,18 @@ trait Configuration {
 
   object Config {
 
-    val helloMsg: String = "Hello world!"
+    object Global {
+      val startUpMessage: String = "Hello world!"
+    }
+
+    object AwsClients {
+
+      object S3 {
+        val accessKey: String = "tbd"
+        val secretKey: String = "tbd"
+      }
+
+    }
 
   }
 
