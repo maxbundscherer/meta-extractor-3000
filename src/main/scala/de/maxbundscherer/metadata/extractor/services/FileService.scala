@@ -6,6 +6,6 @@ import org.slf4j.Logger
 
 class FileService()(implicit log: Logger) extends Configuration {
 
-  log.debug("FileServie started")
+  log.debug("FileService started")
 
 }
