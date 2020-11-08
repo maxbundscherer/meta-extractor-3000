@@ -11,7 +11,7 @@ object Main extends App with Configuration {
   private implicit val log: Logger = LoggerFactory.getLogger("Main-Logger")
 
   private val fileService: FileService   = new FileService()
-  private val awsS3Service: AwsS3Service = new AwsS3Service()
+  private val awsS3Service: AwsS3Service = new AwsS3Service(fileService)
 
-  log.info(s"Application started (${Config.Global.startUpMessage})")
+  log.info(s"Application ended (${Config.Global.startUpMessage})")
 }
