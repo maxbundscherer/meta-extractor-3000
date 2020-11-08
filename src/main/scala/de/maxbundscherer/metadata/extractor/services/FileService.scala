@@ -8,6 +8,7 @@ import scala.util.{ Failure, Success }
 class FileService()(implicit log: Logger) extends Configuration {
 
   import de.maxbundscherer.metadata.extractor.utils.JSON
+  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
 
   import com.amazonaws.services.s3.model.S3ObjectSummary
   import scala.util.Try
@@ -19,7 +20,7 @@ class FileService()(implicit log: Logger) extends Configuration {
   private val fileKeysFilename: String = "fileKeysCache.json"
   private val json: JSON               = new JSON()
 
-  def getCachedFileKeys: Try[Vector[S3ObjectSummary]] =
+  def getCachedFileKeys: Try[Vector[AwsAggregate.FileKey]] =
     Try {
       val jsonData: String =
         File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
@@ -34,7 +35,7 @@ class FileService()(implicit log: Logger) extends Configuration {
     * @param data fileKeys
     * @return Try with filePath
     */
-  def writeCachedFileKeys(data: Vector[S3ObjectSummary]): Try[String] =
+  def writeCachedFileKeys(data: Vector[AwsAggregate.FileKey]): Try[String] =
     Try {
       this.json.convertCacheToJSON(data) match {
         case Failure(exception) => throw exception

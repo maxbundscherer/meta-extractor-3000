@@ -1,20 +1,20 @@
 package de.maxbundscherer.metadata.extractor.services
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import de.maxbundscherer.metadata.extractor.utils.Configuration
-import org.slf4j.Logger
 
+import org.slf4j.Logger
 import scala.util.{ Failure, Success }
 
 class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Configuration {
 
+  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
   import de.maxbundscherer.metadata.extractor.aws.clients.AwsS3Client
 
   private val awsS3Client: AwsS3Client = new AwsS3Client()
 
   log.debug("AwsS3Service started")
 
-  private lazy val cachedItems: Option[Vector[S3ObjectSummary]] =
+  private lazy val cachedItems: Option[Vector[AwsAggregate.FileKey]] =
     this.fileService.getCachedFileKeys match {
       case Failure(exception) =>
         log.info(s"No cached listFiles (${exception.getLocalizedMessage})")
@@ -24,7 +24,7 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
         Some(data)
     }
 
-  private lazy val fileKeys: Vector[S3ObjectSummary] =
+  private lazy val fileKeys: Vector[AwsAggregate.FileKey] =
     this.awsS3Client.listFiles(Config.AwsClients.S3.bucketName, cachedItems = cachedItems) match {
       case Failure(exception) =>
         log.error(s"Got exception in listFiles (${exception.getLocalizedMessage})")
@@ -48,6 +48,8 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
       data.foreach(d => log.info(s"Got item in listBuckets (${d.getName})"))
   }
 
-  this.fileKeys.take(10).foreach(fileKey => log.debug(s"Got fileKey (${fileKey.getKey})"))
+  this.fileKeys
+    .take(10)
+    .foreach(fileKey => log.debug(s"Got fileKey (${fileKey.fileKey}) (${fileKey.size})"))
 
 }

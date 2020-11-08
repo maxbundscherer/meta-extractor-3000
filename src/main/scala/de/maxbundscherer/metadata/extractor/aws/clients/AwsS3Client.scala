@@ -1,5 +1,6 @@
 package de.maxbundscherer.metadata.extractor.aws.clients
 
+import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
 import de.maxbundscherer.metadata.extractor.utils.Configuration
 
 import org.slf4j.Logger
@@ -46,8 +47,8 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
     */
   def listFiles(
       bucketName: String,
-      cachedItems: Option[Vector[S3ObjectSummary]]
-  ): Try[Vector[S3ObjectSummary]] =
+      cachedItems: Option[Vector[AwsAggregate.FileKey]]
+  ): Try[Vector[AwsAggregate.FileKey]] =
     cachedItems match {
       case Some(cache) => Try(cache)
       case None =>
@@ -65,7 +66,7 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
                 log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
               }
 
-              summaries
+              summaries.map(s => AwsAggregate.FileKey(s.getKey, s.getSize))
             }
         }
 
