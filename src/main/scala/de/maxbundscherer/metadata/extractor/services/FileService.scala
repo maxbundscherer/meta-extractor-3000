@@ -28,7 +28,7 @@ class FileService()(implicit log: Logger) extends Configuration {
     */
   def writeCachedFileKeys(data: Vector[S3ObjectSummary]): Try[String] =
     Try {
-      this.json.convertToJSON(data) match {
+      this.json.convertCacheToJSON(data) match {
         case Failure(exception) => throw exception
         case Success(jsonContent) =>
           File(s"${Config.Global.cacheDirectory}")
