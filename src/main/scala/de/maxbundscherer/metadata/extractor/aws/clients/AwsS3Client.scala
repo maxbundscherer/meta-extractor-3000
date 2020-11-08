@@ -38,23 +38,37 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
         }
     }
 
-  def listFiles(bucketName: String): Try[Vector[S3ObjectSummary]] =
-    this.awsS3Client match {
-      case Failure(exception) => throw exception
-      case Success(awsS3Client) =>
-        Try {
+  /**
+    * Get S3ObjectSummary from s3 bucket
+    * @param bucketName String
+    * @param cachedItems If set return cache
+    * @return S3ObjectSummary
+    */
+  def listFiles(
+      bucketName: String,
+      cachedItems: Option[Vector[S3ObjectSummary]]
+  ): Try[Vector[S3ObjectSummary]] =
+    cachedItems match {
+      case Some(cache) => Try(cache)
+      case None =>
+        this.awsS3Client match {
+          case Failure(exception) => throw exception
+          case Success(awsS3Client) =>
+            Try {
 
-          var listing: ObjectListing             = awsS3Client.listObjects(bucketName)
-          var summaries: Vector[S3ObjectSummary] = listing.getObjectSummaries.asScala.toVector
+              var listing: ObjectListing             = awsS3Client.listObjects(bucketName)
+              var summaries: Vector[S3ObjectSummary] = listing.getObjectSummaries.asScala.toVector
 
-          while (listing.isTruncated) {
-            listing = awsS3Client.listNextBatchOfObjects(listing)
-            summaries = summaries ++ listing.getObjectSummaries.asScala.toVector
-            log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
-          }
+              while (listing.isTruncated) {
+                listing = awsS3Client.listNextBatchOfObjects(listing)
+                summaries = summaries ++ listing.getObjectSummaries.asScala.toVector
+                log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
+              }
 
-          summaries
+              summaries
+            }
         }
+
     }
 
 }
