@@ -12,4 +12,6 @@ class AwsS3Service()(implicit log: Logger) extends Configuration {
 
   log.debug("AwsS3Service started")
 
+  this.awsS3Client.listBuckets()
+
 }

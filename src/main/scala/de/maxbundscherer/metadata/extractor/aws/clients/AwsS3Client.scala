@@ -14,6 +14,8 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
   import scala.util.{ Failure, Success, Try }
   import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
   import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
+  import com.amazonaws.services.s3.model.Bucket
+  import scala.jdk.CollectionConverters._
 
   private lazy val awsS3Client: AmazonS3 = AmazonS3ClientBuilder
     .standard()
@@ -24,5 +26,12 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
     )
     //.withRegion(awsS3ClientRegion)
     .build()
+
+  def listBuckets(): Unit = {
+
+    val data: Vector[Bucket] = this.awsS3Client.listBuckets().asScala.toVector
+    data.foreach(d => log.info(s"Got s3 bucket (${d.getName})"))
+
+  }
 
 }
