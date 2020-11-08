@@ -39,7 +39,7 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
       this.fileService.writeCachedFileKeys(fileKeys) match {
         case Failure(exception) =>
           log.warn(s"Exception in cache update (${exception.getLocalizedMessage})")
-        case Success(_) => log.info("Cached updated")
+        case Success(filePath) => log.info(s"Cached updated ($filePath)")
       }
     //data.foreach(d => log.info(s"Got item in listFiles (${d.getKey})"))
   }

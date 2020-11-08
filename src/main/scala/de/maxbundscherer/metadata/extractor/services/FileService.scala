@@ -19,7 +19,15 @@ class FileService()(implicit log: Logger) extends Configuration {
   private val fileKeysFilename: String = "fileKeysCache.json"
   private val json: JSON               = new JSON()
 
-  def getCachedFileKeys: Try[Vector[S3ObjectSummary]] = Try(???)
+  def getCachedFileKeys: Try[Vector[S3ObjectSummary]] =
+    Try {
+      val jsonData: String =
+        File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
+      this.json.convertCacheFromJSON(jsonData) match {
+        case Failure(exception) => throw exception
+        case Success(fileKeys)  => fileKeys
+      }
+    }
 
   /**
     * Write file keys to cache

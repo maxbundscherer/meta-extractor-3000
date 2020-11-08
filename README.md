@@ -12,7 +12,8 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ## Features
 
-- ✅ tbd
+- ✅ Get s3 buckets
+- ✅ Get s3 buckets fileKeys (json-cached included)
 - ...
 
 ## I still have things to do...
@@ -31,4 +32,5 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 - Read [config](./src/main/scala/de/maxbundscherer/metadata/extractor/utils/Configuration.scala)
 - Run with ``sbt run``
+- Clear cache with ``rm -rf cache/``
 - Triggered Restart (recommend) ``sbt ~reStart``
