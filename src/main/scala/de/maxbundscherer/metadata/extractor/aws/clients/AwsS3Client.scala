@@ -2,7 +2,6 @@ package de.maxbundscherer.metadata.extractor.aws.clients
 
 import de.maxbundscherer.metadata.extractor.utils.Configuration
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import org.slf4j.Logger
 
 class AwsS3Client()(implicit log: Logger) extends Configuration {
@@ -16,26 +15,46 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
   import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
   import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
   import com.amazonaws.services.s3.model.Bucket
+  import com.amazonaws.services.s3.model.{ ObjectListing, S3ObjectSummary }
   import scala.jdk.CollectionConverters._
 
-  private lazy val awsS3Client: AmazonS3 = AmazonS3ClientBuilder
-    .standard()
-    .withCredentials(
-      new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(Config.AwsClients.S3.accessKey, Config.AwsClients.S3.secretKey)
+  private lazy val awsS3Client: Try[AmazonS3] = Try {
+    AmazonS3ClientBuilder
+      .standard()
+      .withCredentials(
+        new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(Config.AwsClients.S3.accessKey, Config.AwsClients.S3.secretKey)
+        )
       )
-    )
-    .build()
-
-  def listBuckets(): Unit = {
-    val data: Vector[Bucket] = this.awsS3Client.listBuckets().asScala.toVector
-    data.foreach(d => log.info(s"Got s3 bucket (${d.getName})"))
+      .build()
   }
 
-  def listFiles(bucketName: String): Unit = {
-    val data: Vector[S3ObjectSummary] =
-      this.awsS3Client.listObjects(bucketName).getObjectSummaries.asScala.toVector
-    data.foreach(d => log.info(s"Got s3 bucket (${d.getKey}) (${d.getSize})"))
-  }
+  def listBuckets: Try[Vector[Bucket]] =
+    this.awsS3Client match {
+      case Failure(exception) => throw exception
+      case Success(awsS3Client) =>
+        Try {
+          awsS3Client.listBuckets().asScala.toVector
+        }
+    }
+
+  def listFiles(bucketName: String): Try[Vector[S3ObjectSummary]] =
+    this.awsS3Client match {
+      case Failure(exception) => throw exception
+      case Success(awsS3Client) =>
+        Try {
+
+          var listing: ObjectListing             = awsS3Client.listObjects(bucketName)
+          var summaries: Vector[S3ObjectSummary] = listing.getObjectSummaries.asScala.toVector
+
+          while (listing.isTruncated) {
+            listing = awsS3Client.listNextBatchOfObjects(listing)
+            summaries = summaries ++ listing.getObjectSummaries.asScala.toVector
+            log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
+          }
+
+          summaries
+        }
+    }
 
 }
