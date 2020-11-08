@@ -11,8 +11,9 @@ trait Configuration {
     object AwsClients {
 
       object S3 {
-        val accessKey: String = "tbd"
-        val secretKey: String = "tbd"
+        val accessKey: String  = "tbd"
+        val secretKey: String  = "tbd"
+        val bucketName: String = "tbd"
       }
 
     }
