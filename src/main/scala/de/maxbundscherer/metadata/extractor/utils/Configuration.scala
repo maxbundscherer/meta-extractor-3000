@@ -6,6 +6,7 @@ trait Configuration {
 
     object Global {
       val startUpMessage: String = "Hello world!"
+      val cacheDirectory: String = "cache/"
     }
 
     object AwsClients {

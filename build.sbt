@@ -7,3 +7,6 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 
 // AWS SDK
 libraryDependencies += "com.amazonaws" % "aws-java-sdk" % "1.11.896"
+
+// Better Files
+libraryDependencies += "com.github.pathikrit" %% "better-files" % "3.9.1"
