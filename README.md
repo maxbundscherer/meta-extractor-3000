@@ -24,7 +24,6 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ### Required
 
-- ``gnupg`` (``brew install gnupg`` on macOS)
 - ``java``
 - ``sbt`` (only as developer)
 
