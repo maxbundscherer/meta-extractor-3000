@@ -5,7 +5,7 @@ import org.slf4j.Logger
 
 class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Configuration {
 
-  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
+  import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
 
   import scala.util.{ Failure, Success, Try }
   import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
@@ -36,7 +36,7 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
     * Get Buckets from s3
     * @return Buckets
     */
-  def getBuckets: Try[Vector[AwsAggregate.Bucket]] =
+  def getBuckets: Try[Vector[AwsS3Aggregate.Bucket]] =
     this.awsS3Client match {
       case Failure(exception) => throw exception
       case Success(client) =>
@@ -45,7 +45,7 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
             .listBuckets()
             .asScala
             .toVector
-            .map(b => AwsAggregate.Bucket(name = b.getName))
+            .map(b => AwsS3Aggregate.Bucket(name = b.getName))
         }
     }
 
@@ -55,9 +55,9 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
     * @param bucketName String
     * @return FileInfos
     */
-  def getFileInfos(useCache: Boolean, bucketName: String): Try[Vector[AwsAggregate.FileInfo]] = {
+  def getFileInfos(useCache: Boolean, bucketName: String): Try[Vector[AwsS3Aggregate.FileInfo]] = {
 
-    val cache: Option[Vector[AwsAggregate.FileInfo]] =
+    val cache: Option[Vector[AwsS3Aggregate.FileInfo]] =
       if (!useCache) None
       else
         this.fileService.getCachedAwsFileInfos match {
@@ -87,7 +87,7 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
                 log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
               }
 
-              val ans = summaries.map(s => AwsAggregate.FileInfo(s.getKey, s.getSize))
+              val ans = summaries.map(s => AwsS3Aggregate.FileInfo(s.getKey, s.getSize))
 
               this.fileService.writeCachedAwsFileInfos(ans) match {
                 case Failure(exception) =>
