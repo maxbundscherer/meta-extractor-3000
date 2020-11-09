@@ -5,7 +5,7 @@ import org.slf4j.Logger
 
 class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Configuration {
 
-  import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
+  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
 
   import scala.util.{ Failure, Success, Try }
   import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }

@@ -1,4 +1,4 @@
-package de.maxbundscherer.metadata.extractor.aws.aggregates
+package de.maxbundscherer.metadata.extractor.aggregates
 
 //TODO: Rename it to s3
 object AwsAggregate {
