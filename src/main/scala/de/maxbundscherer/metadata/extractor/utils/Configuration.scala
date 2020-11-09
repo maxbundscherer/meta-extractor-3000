@@ -5,7 +5,7 @@ trait Configuration {
   object Config {
 
     object Global {
-      val startUpMessage: String = "Hello world!"
+      val message: String        = "Hello world!"
       val cacheDirectory: String = "cache/"
     }
 
