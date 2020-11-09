@@ -1,6 +1,6 @@
 package de.maxbundscherer.metadata.extractor.utils
 
-class JSON {
+object JSON {
 
   import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
 

@@ -14,6 +14,7 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 - ✅ Get s3 buckets
 - ✅ Get s3 buckets fileKeys (json-cached included)
+- ✅ Different runners included
 - ...
 
 ## I still have things to do...

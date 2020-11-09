@@ -1,11 +1,12 @@
 package de.maxbundscherer.metadata.extractor.aws.clients
 
-import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
 import de.maxbundscherer.metadata.extractor.utils.Configuration
 
 import org.slf4j.Logger
 
 class AwsS3Client()(implicit log: Logger) extends Configuration {
+
+  import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
 
   import com.amazonaws.services.s3.model.{
     CannedAccessControlList,
@@ -20,6 +21,8 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
   import scala.jdk.CollectionConverters._
 
   private lazy val awsS3Client: Try[AmazonS3] = Try {
+
+    log.debug("Login to aws")
     AmazonS3ClientBuilder
       .standard()
       .withCredentials(

@@ -5,7 +5,7 @@ import org.slf4j.Logger
 
 import scala.util.{ Failure, Success }
 
-class FileService()(implicit log: Logger) extends Configuration {
+class FileService() extends Configuration {
 
   import de.maxbundscherer.metadata.extractor.utils.JSON
   import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
@@ -15,16 +15,13 @@ class FileService()(implicit log: Logger) extends Configuration {
   import better.files._
   import java.io.{ File => JFile }
 
-  log.debug("FileService started")
-
   private val fileKeysFilename: String = "aws_fileInfos.json"
-  private val json: JSON               = new JSON()
 
   def getCachedAwsFileInfos: Try[Vector[AwsAggregate.FileInfo]] =
     Try {
       val jsonData: String =
         File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
-      this.json.convertAwsFileInfosFromJSON(jsonData) match {
+      JSON.convertAwsFileInfosFromJSON(jsonData) match {
         case Failure(exception) => throw exception
         case Success(fileKeys)  => fileKeys
       }
@@ -37,7 +34,7 @@ class FileService()(implicit log: Logger) extends Configuration {
     */
   def writeCachedAwsFileInfos(data: Vector[AwsAggregate.FileInfo]): Try[String] =
     Try {
-      this.json.convertAwsFileInfosToJSON(data) match {
+      JSON.convertAwsFileInfosToJSON(data) match {
         case Failure(exception) => throw exception
         case Success(jsonContent) =>
           File(s"${Config.Global.cacheDirectory}")
