@@ -17,7 +17,7 @@ class FileService()(implicit log: Logger) extends Configuration {
 
   log.debug("FileService started")
 
-  private val fileKeysFilename: String = "fileKeysCache.json"
+  private val fileKeysFilename: String = "aws_fileInfos.json"
   private val json: JSON               = new JSON()
 
   def getCachedAwsFileInfos: Try[Vector[AwsAggregate.FileInfo]] =
