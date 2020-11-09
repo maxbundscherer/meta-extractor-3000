@@ -1,54 +1,109 @@
 package de.maxbundscherer.metadata.extractor.services
 
 import de.maxbundscherer.metadata.extractor.utils.Configuration
-
 import org.slf4j.Logger
-import scala.util.{ Failure, Success }
 
 class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Configuration {
 
   import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
-  import de.maxbundscherer.metadata.extractor.aws.clients.AwsS3Client
 
-  private val awsS3Client: AwsS3Client = new AwsS3Client()
+  import scala.util.{ Failure, Success, Try }
+  import com.amazonaws.auth.{ AWSStaticCredentialsProvider, BasicAWSCredentials }
+  import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
+  import com.amazonaws.services.s3.model.Bucket
+  import com.amazonaws.services.s3.model.{ ObjectListing, S3ObjectSummary }
+  import scala.jdk.CollectionConverters._
+
+  /**
+    * Aws S3 Client
+    */
+  private lazy val awsS3Client: Try[AmazonS3] = Try {
+
+    log.debug("Login to aws")
+    AmazonS3ClientBuilder
+      .standard()
+      .withCredentials(
+        new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(Config.AwsClients.S3.accessKey, Config.AwsClients.S3.secretKey)
+        )
+      )
+      .build()
+  }
 
   log.debug("AwsS3Service started")
 
-  private lazy val cachedItems: Option[Vector[AwsAggregate.FileInfo]] =
-    this.fileService.getCachedAwsFileInfos match {
-      case Failure(exception) =>
-        log.info(s"No cached listFiles (${exception.getLocalizedMessage})")
-        None
-      case Success(data) =>
-        log.info("Use cached listFiles")
-        Some(data)
-    }
-
-  private lazy val fileKeys: Vector[AwsAggregate.FileInfo] =
-    this.awsS3Client
-      .getFileInfos(Config.AwsClients.S3.bucketName, cachedItems = cachedItems) match {
-      case Failure(exception) =>
-        log.error(s"Got exception in listFiles (${exception.getLocalizedMessage})")
-        ???
-      case Success(fileKeys) =>
-        log.info(s"Got ${fileKeys.size} items in listFiles")
-        this.fileService.writeCachedAwsFileInfos(fileKeys) match {
-          case Failure(exception) =>
-            log.warn(s"Exception in cache update (${exception.getLocalizedMessage})")
-            ???
-          case Success(filePath) =>
-            log.info(s"Cached updated ($filePath)")
-            fileKeys
+  /**
+    * Get Buckets from s3
+    * @return Buckets
+    */
+  def getBuckets: Try[Vector[AwsAggregate.Bucket]] =
+    this.awsS3Client match {
+      case Failure(exception) => throw exception
+      case Success(client) =>
+        Try {
+          client
+            .listBuckets()
+            .asScala
+            .toVector
+            .map(b => AwsAggregate.Bucket(name = b.getName))
         }
     }
 
-  this.awsS3Client.getBuckets match {
-    case Failure(exception) =>
-      log.error(s"Got exception in listBuckets (${exception.getLocalizedMessage})")
-    case Success(data) =>
-      data.foreach(d => log.info(s"Got item in listBuckets (${d.getName})"))
+  /**
+    * Get FileInfos from s3 (updates cache too)
+    * @param useCache Boolean
+    * @param bucketName String
+    * @return FileInfos
+    */
+  def getFileInfos(useCache: Boolean, bucketName: String): Try[Vector[AwsAggregate.FileInfo]] = {
+
+    val cache: Option[Vector[AwsAggregate.FileInfo]] =
+      if (!useCache) None
+      else
+        this.fileService.getCachedAwsFileInfos match {
+          case Failure(exception) =>
+            log.warn(s"Cache read getFileInfos exception (${exception.getLocalizedMessage})")
+            None
+          case Success(value) => Some(value)
+        }
+
+    cache match {
+      case Some(value) =>
+        log.info(s"Use cache for getFileInfos ${value.length} items found")
+        Try(value)
+      case None =>
+        log.info("No cache for getFileInfos. Download data from s3")
+        this.awsS3Client match {
+          case Failure(exception) => throw exception
+          case Success(client) =>
+            Try {
+
+              var listing: ObjectListing             = client.listObjects(bucketName)
+              var summaries: Vector[S3ObjectSummary] = listing.getObjectSummaries.asScala.toVector
+
+              while (listing.isTruncated) {
+                listing = client.listNextBatchOfObjects(listing)
+                summaries = summaries ++ listing.getObjectSummaries.asScala.toVector
+                log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
+              }
+
+              val ans = summaries.map(s => AwsAggregate.FileInfo(s.getKey, s.getSize))
+
+              this.fileService.writeCachedAwsFileInfos(ans) match {
+                case Failure(exception) =>
+                  log.error(s"Error in writeCachedAwsFileInfos (${exception.getLocalizedMessage})")
+                case Success(filePath) => log.info(s"WriteCachedAwsFileInfos success ($filePath)")
+              }
+
+              ans
+            }
+        }
+    }
+
   }
 
+  //TODO: Add query
+  /*
   log.info(
     "##########################################################################################"
   )
@@ -73,5 +128,6 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
   log.info(
     "##########################################################################################"
   )
+   */
 
 }

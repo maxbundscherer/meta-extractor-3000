@@ -17,6 +17,10 @@ class FileService() extends Configuration {
 
   private val fileKeysFilename: String = "aws_fileInfos.json"
 
+  /**
+    * Get file info from cache
+    * @return FileInfos
+    */
   def getCachedAwsFileInfos: Try[Vector[AwsAggregate.FileInfo]] =
     Try {
       val jsonData: String =
@@ -29,7 +33,7 @@ class FileService() extends Configuration {
 
   /**
     * Write file info to cache
-    * @param data fileKeys
+    * @param data FileInfos
     * @return Try with filePath
     */
   def writeCachedAwsFileInfos(data: Vector[AwsAggregate.FileInfo]): Try[String] =
