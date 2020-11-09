@@ -20,24 +20,24 @@ class FileService()(implicit log: Logger) extends Configuration {
   private val fileKeysFilename: String = "fileKeysCache.json"
   private val json: JSON               = new JSON()
 
-  def getCachedFileKeys: Try[Vector[AwsAggregate.FileKey]] =
+  def getCachedAwsFileInfos: Try[Vector[AwsAggregate.FileInfo]] =
     Try {
       val jsonData: String =
         File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
-      this.json.convertCacheFromJSON(jsonData) match {
+      this.json.convertAwsFileInfosFromJSON(jsonData) match {
         case Failure(exception) => throw exception
         case Success(fileKeys)  => fileKeys
       }
     }
 
   /**
-    * Write file keys to cache
+    * Write file info to cache
     * @param data fileKeys
     * @return Try with filePath
     */
-  def writeCachedFileKeys(data: Vector[AwsAggregate.FileKey]): Try[String] =
+  def writeCachedAwsFileInfos(data: Vector[AwsAggregate.FileInfo]): Try[String] =
     Try {
-      this.json.convertCacheToJSON(data) match {
+      this.json.convertAwsFileInfosToJSON(data) match {
         case Failure(exception) => throw exception
         case Success(jsonContent) =>
           File(s"${Config.Global.cacheDirectory}")

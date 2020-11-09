@@ -14,8 +14,8 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
 
   log.debug("AwsS3Service started")
 
-  private lazy val cachedItems: Option[Vector[AwsAggregate.FileKey]] =
-    this.fileService.getCachedFileKeys match {
+  private lazy val cachedItems: Option[Vector[AwsAggregate.FileInfo]] =
+    this.fileService.getCachedAwsFileInfos match {
       case Failure(exception) =>
         log.info(s"No cached listFiles (${exception.getLocalizedMessage})")
         None
@@ -24,14 +24,15 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
         Some(data)
     }
 
-  private lazy val fileKeys: Vector[AwsAggregate.FileKey] =
-    this.awsS3Client.listFiles(Config.AwsClients.S3.bucketName, cachedItems = cachedItems) match {
+  private lazy val fileKeys: Vector[AwsAggregate.FileInfo] =
+    this.awsS3Client
+      .getFileInfos(Config.AwsClients.S3.bucketName, cachedItems = cachedItems) match {
       case Failure(exception) =>
         log.error(s"Got exception in listFiles (${exception.getLocalizedMessage})")
         ???
       case Success(fileKeys) =>
         log.info(s"Got ${fileKeys.size} items in listFiles")
-        this.fileService.writeCachedFileKeys(fileKeys) match {
+        this.fileService.writeCachedAwsFileInfos(fileKeys) match {
           case Failure(exception) =>
             log.warn(s"Exception in cache update (${exception.getLocalizedMessage})")
             ???
@@ -41,7 +42,7 @@ class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Confi
         }
     }
 
-  this.awsS3Client.listBuckets match {
+  this.awsS3Client.getBuckets match {
     case Failure(exception) =>
       log.error(s"Got exception in listBuckets (${exception.getLocalizedMessage})")
     case Success(data) =>

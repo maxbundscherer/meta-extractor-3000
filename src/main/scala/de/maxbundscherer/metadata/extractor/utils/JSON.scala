@@ -8,12 +8,12 @@ class JSON {
   import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
   import scala.util.Try
 
-  def convertCacheToJSON(data: Vector[AwsAggregate.FileKey]): Try[String] =
+  def convertAwsFileInfosToJSON(data: Vector[AwsAggregate.FileInfo]): Try[String] =
     Try(data.asJson.noSpaces)
 
-  def convertCacheFromJSON(data: String): Try[Vector[AwsAggregate.FileKey]] =
+  def convertAwsFileInfosFromJSON(data: String): Try[Vector[AwsAggregate.FileInfo]] =
     Try {
-      decode[Vector[AwsAggregate.FileKey]](data) match {
+      decode[Vector[AwsAggregate.FileInfo]](data) match {
         case Left(error)  => throw error
         case Right(value) => value
       }

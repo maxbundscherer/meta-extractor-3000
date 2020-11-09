@@ -30,7 +30,7 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
       .build()
   }
 
-  def listBuckets: Try[Vector[Bucket]] =
+  def getBuckets: Try[Vector[Bucket]] =
     this.awsS3Client match {
       case Failure(exception) => throw exception
       case Success(awsS3Client) =>
@@ -45,10 +45,10 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
     * @param cachedItems If set return cache
     * @return S3ObjectSummary
     */
-  def listFiles(
+  def getFileInfos(
       bucketName: String,
-      cachedItems: Option[Vector[AwsAggregate.FileKey]]
-  ): Try[Vector[AwsAggregate.FileKey]] =
+      cachedItems: Option[Vector[AwsAggregate.FileInfo]]
+  ): Try[Vector[AwsAggregate.FileInfo]] =
     cachedItems match {
       case Some(cache) => Try(cache)
       case None =>
@@ -66,7 +66,7 @@ class AwsS3Client()(implicit log: Logger) extends Configuration {
                 log.debug(s"Pagination in progress... (${summaries.size} items already loaded)")
               }
 
-              summaries.map(s => AwsAggregate.FileKey(s.getKey, s.getSize))
+              summaries.map(s => AwsAggregate.FileInfo(s.getKey, s.getSize))
             }
         }
 
