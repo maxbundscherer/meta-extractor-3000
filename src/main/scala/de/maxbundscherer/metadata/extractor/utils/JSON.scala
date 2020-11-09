@@ -2,7 +2,7 @@ package de.maxbundscherer.metadata.extractor.utils
 
 class JSON {
 
-  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
+  import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
 
   import com.amazonaws.services.s3.model.S3ObjectSummary
   import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._

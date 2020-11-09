@@ -7,7 +7,7 @@ import scala.util.{ Failure, Success }
 
 class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Configuration {
 
-  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
+  import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
   import de.maxbundscherer.metadata.extractor.aws.clients.AwsS3Client
 
   private val awsS3Client: AwsS3Client = new AwsS3Client()

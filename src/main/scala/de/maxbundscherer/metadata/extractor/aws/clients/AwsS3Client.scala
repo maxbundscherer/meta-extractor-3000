@@ -1,6 +1,6 @@
 package de.maxbundscherer.metadata.extractor.aws.clients
 
-import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
+import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
 import de.maxbundscherer.metadata.extractor.utils.Configuration
 
 import org.slf4j.Logger

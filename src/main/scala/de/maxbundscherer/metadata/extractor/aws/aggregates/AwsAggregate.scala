@@ -1,4 +1,4 @@
-package de.maxbundscherer.metadata.extractor.aggregates
+package de.maxbundscherer.metadata.extractor.aws.aggregates
 
 object AwsAggregate {
 

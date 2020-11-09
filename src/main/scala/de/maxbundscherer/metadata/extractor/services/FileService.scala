@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success }
 class FileService()(implicit log: Logger) extends Configuration {
 
   import de.maxbundscherer.metadata.extractor.utils.JSON
-  import de.maxbundscherer.metadata.extractor.aggregates.AwsAggregate
+  import de.maxbundscherer.metadata.extractor.aws.aggregates.AwsAggregate
 
   import com.amazonaws.services.s3.model.S3ObjectSummary
   import scala.util.Try
