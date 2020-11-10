@@ -33,7 +33,7 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
 
     cache match {
       case Some(value) =>
-        log.info(s"Use cache for getFileInfos ${value.length} items found")
+        log.debug(s"Use cache for getFileInfos ${value.length} items found")
         Try(value)
       case None =>
         log.info("No cache for getFileInfos. Process now")
