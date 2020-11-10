@@ -7,6 +7,8 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
   import de.maxbundscherer.metadata.extractor.aggregates.LocalAggregate
 
   import scala.util.Try
+  import better.files._
+  import java.io.{ File => JFile }
   import scala.util.{ Failure, Success }
 
   /**
@@ -33,14 +35,16 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
       case None =>
         log.info("No cache for getFileInfos. Process now")
         Try {
-          val ans: Vector[LocalAggregate.FileInfo] = ???
-
+          val ans: Vector[LocalAggregate.FileInfo] = {
+            val dir = File(Config.Runners.DebugRunner.localWorkDir)
+            dir.listRecursively.toVector
+              .map(f => LocalAggregate.FileInfo(filePath = f.toString()))
+          }
           this.cacheService.writeCachedLocalFileInfos(ans) match {
             case Failure(exception) =>
               log.error(s"Error in write cache (${exception.getLocalizedMessage})")
             case Success(filePath) => log.info(s"Write cache success ($filePath)")
           }
-
           ans
         }
     }
