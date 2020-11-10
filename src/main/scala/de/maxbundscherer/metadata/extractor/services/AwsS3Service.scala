@@ -1,8 +1,8 @@
 package de.maxbundscherer.metadata.extractor.services
 
-import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, LoggerHelper }
+import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, LoggingHelper }
 
-class AwsS3Service(fileService: FileService) extends ConfigurationHelper with LoggerHelper {
+class AwsS3Service(fileService: FileService) extends ConfigurationHelper with LoggingHelper {
 
   import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
 

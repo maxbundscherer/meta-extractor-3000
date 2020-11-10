@@ -11,6 +11,9 @@ libraryDependencies += "com.amazonaws" % "aws-java-sdk" % "1.11.896"
 //Better Files
 libraryDependencies += "com.github.pathikrit" %% "better-files" % "3.9.1"
 
+//Config Factory
+libraryDependencies += "com.typesafe" % "config" % "1.4.1"
+
 //JSON
 val circeVersion = "0.12.3"
 

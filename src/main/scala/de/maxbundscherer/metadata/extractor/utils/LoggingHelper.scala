@@ -1,6 +1,6 @@
 package de.maxbundscherer.metadata.extractor.utils
 
-trait LoggerHelper {
+trait LoggingHelper {
 
   import org.slf4j.{ Logger, LoggerFactory }
 
