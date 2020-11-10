@@ -5,6 +5,9 @@ import de.maxbundscherer.metadata.extractor.services.{ AwsS3Service, LocalFileSe
 class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService)
     extends AbstractRunner(awsS3Service = awsS3Service) {
 
+  import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
+  import de.maxbundscherer.metadata.extractor.aggregates.LocalAggregate
+
   import scala.util.{ Failure, Success }
 
   override def run: Unit = {
@@ -16,19 +19,48 @@ class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService
       case Success(buckets) => buckets.foreach(b => log.info(s"Get bucket '${b.name}' from aws"))
     }
     log.info("# Get fileInfos from s3")
-    this.awsS3Service
+    val awsFileInfos: Vector[AwsS3Aggregate.FileInfo] = this.awsS3Service
       .getFileInfos(useCache = true, bucketName = Config.AwsClients.S3.bucketName) match {
       case Failure(exception) =>
         log.error(s"Error in getFileInfos (${exception.getLocalizedMessage}) from aws")
-      case Success(fileInfos) => log.info(s"Loaded ${fileInfos.length} fileInfos from aws")
+        throw exception
+      case Success(fileInfos) =>
+        log.info(s"Loaded ${fileInfos.length} fileInfos from aws")
+        fileInfos
     }
     log.info("# Get fileInfos from local dir")
-    this.localFileService
+    val localFileInfos: Vector[LocalAggregate.FileInfo] = this.localFileService
       .getFileInfos(useCache = true) match {
       case Failure(exception) =>
         log.error(s"Error in getFileInfos (${exception.getLocalizedMessage}) from local dir")
-      case Success(fileInfos) => log.info(s"Loaded ${fileInfos.length} fileInfos from local dir")
+        throw exception
+      case Success(fileInfos) =>
+        log.info(s"Loaded ${fileInfos.length} fileInfos from local dir")
+        fileInfos
     }
+    log.info("# Start query executor")
+    queryExecutor(awsFileInfos, localFileInfos)
+  }
+
+  private def queryExecutor(
+      awsFileInfos: Vector[AwsS3Aggregate.FileInfo],
+      localFileInfos: Vector[LocalAggregate.FileInfo]
+  ): Unit = {
+    val localFileKeys = localFileInfos.map(_.fileKey)
+    val awsFileKeys   = awsFileInfos.map(_.fileKey)
+
+    log.info("# -- Count only local files")
+    val onlyLocal = localFileKeys.diff(awsFileKeys)
+    log.info("Only local: " + onlyLocal.length)
+
+    log.info("# -- Count only files on aws")
+    val onlyAws = awsFileKeys.diff(localFileKeys)
+    log.info("Only on aws: " + onlyAws.length)
+
+    log.info("# -- Count both")
+    val both = awsFileKeys.intersect(localFileKeys)
+    log.info("Only on aws: " + both.length)
+
   }
 
   //TODO: Add query
