@@ -1,12 +1,11 @@
 package de.maxbundscherer.metadata.extractor.runners
 
 import de.maxbundscherer.metadata.extractor.services.AwsS3Service
-import de.maxbundscherer.metadata.extractor.utils.Configuration
+import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, LoggerHelper }
 
-import org.slf4j.Logger
-
-abstract class AbstractRunner(awsS3Service: AwsS3Service)(implicit log: Logger)
-    extends Configuration {
+abstract class AbstractRunner(awsS3Service: AwsS3Service)
+    extends ConfigurationHelper
+    with LoggerHelper {
 
   def run: Unit
 

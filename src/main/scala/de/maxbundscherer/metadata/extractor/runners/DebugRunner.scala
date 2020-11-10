@@ -1,10 +1,8 @@
 package de.maxbundscherer.metadata.extractor.runners
 
 import de.maxbundscherer.metadata.extractor.services.AwsS3Service
-import org.slf4j.Logger
 
-class DebugRunner(awsS3Service: AwsS3Service)(implicit log: Logger)
-    extends AbstractRunner(awsS3Service = awsS3Service) {
+class DebugRunner(awsS3Service: AwsS3Service) extends AbstractRunner(awsS3Service = awsS3Service) {
 
   import scala.util.{ Failure, Success }
 

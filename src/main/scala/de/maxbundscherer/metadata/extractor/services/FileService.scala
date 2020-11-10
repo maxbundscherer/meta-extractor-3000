@@ -1,19 +1,16 @@
 package de.maxbundscherer.metadata.extractor.services
 
-import de.maxbundscherer.metadata.extractor.utils.Configuration
-import org.slf4j.Logger
+import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, JsonHelper }
 
-import scala.util.{ Failure, Success }
+class FileService() extends ConfigurationHelper with JsonHelper {
 
-class FileService() extends Configuration {
-
-  import de.maxbundscherer.metadata.extractor.utils.JSON
   import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
 
   import com.amazonaws.services.s3.model.S3ObjectSummary
   import scala.util.Try
   import better.files._
   import java.io.{ File => JFile }
+  import scala.util.{ Failure, Success }
 
   private val fileKeysFilename: String = "aws_fileInfos.json"
 
@@ -25,7 +22,7 @@ class FileService() extends Configuration {
     Try {
       val jsonData: String =
         File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
-      JSON.convertAwsFileInfosFromJSON(jsonData) match {
+      Json.convertAwsFileInfosFromJSON(jsonData) match {
         case Failure(exception) => throw exception
         case Success(fileKeys)  => fileKeys
       }
@@ -38,7 +35,7 @@ class FileService() extends Configuration {
     */
   def writeCachedAwsFileInfos(data: Vector[AwsS3Aggregate.FileInfo]): Try[String] =
     Try {
-      JSON.convertAwsFileInfosToJSON(data) match {
+      Json.convertAwsFileInfosToJSON(data) match {
         case Failure(exception) => throw exception
         case Success(jsonContent) =>
           File(s"${Config.Global.cacheDirectory}")

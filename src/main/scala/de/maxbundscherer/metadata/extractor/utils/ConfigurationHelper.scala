@@ -1,6 +1,6 @@
 package de.maxbundscherer.metadata.extractor.utils
 
-trait Configuration {
+trait ConfigurationHelper {
 
   object Config {
 

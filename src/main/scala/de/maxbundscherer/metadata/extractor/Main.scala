@@ -1,15 +1,13 @@
 package de.maxbundscherer.metadata.extractor
 
-import de.maxbundscherer.metadata.extractor.utils.Configuration
+import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, LoggerHelper }
 
-object Main extends App with Configuration {
+object Main extends App with ConfigurationHelper with LoggerHelper {
 
   import de.maxbundscherer.metadata.extractor.runners.{ AbstractRunner, DebugRunner }
   import de.maxbundscherer.metadata.extractor.services.{ AwsS3Service, FileService }
 
   import org.slf4j.{ Logger, LoggerFactory }
-
-  private implicit val log: Logger = LoggerFactory.getLogger("Main-Logger")
 
   private val fileService: FileService   = new FileService()
   private val awsS3Service: AwsS3Service = new AwsS3Service(fileService)

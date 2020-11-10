@@ -31,7 +31,7 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ### Let's go (developer)
 
-- Read [config](./src/main/scala/de/maxbundscherer/metadata/extractor/utils/Configuration.scala)
+- Read [config](src/main/scala/de/maxbundscherer/metadata/extractor/utils/ConfigurationHelper.scala)
 - Run with ``sbt run``
 - Clear cache with ``rm -rf cache/``
 - Triggered Restart (recommend) ``sbt ~reStart``

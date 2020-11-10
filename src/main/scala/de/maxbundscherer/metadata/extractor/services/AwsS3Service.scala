@@ -1,9 +1,8 @@
 package de.maxbundscherer.metadata.extractor.services
 
-import de.maxbundscherer.metadata.extractor.utils.Configuration
-import org.slf4j.Logger
+import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, LoggerHelper }
 
-class AwsS3Service(fileService: FileService)(implicit log: Logger) extends Configuration {
+class AwsS3Service(fileService: FileService) extends ConfigurationHelper with LoggerHelper {
 
   import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
 
