@@ -26,9 +26,25 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
           case Success(value) => Some(value)
         }
 
-    //TODO: Implement getFileInfos local
-    //TODO: Implement write to cache...
-    Try(???)
+    cache match {
+      case Some(value) =>
+        log.info(s"Use cache for getFileInfos ${value.length} items found")
+        Try(value)
+      case None =>
+        log.info("No cache for getFileInfos. Process now")
+        Try {
+          val ans: Vector[LocalAggregate.FileInfo] = ???
+
+          this.cacheService.writeCachedLocalFileInfos(ans) match {
+            case Failure(exception) =>
+              log.error(s"Error in write cache (${exception.getLocalizedMessage})")
+            case Success(filePath) => log.info(s"Write cache success ($filePath)")
+          }
+
+          ans
+        }
+    }
+
   }
 
 }

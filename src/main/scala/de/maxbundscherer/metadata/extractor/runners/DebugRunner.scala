@@ -31,7 +31,6 @@ class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService
     }
   }
 
-  //TODO: Add local file reader!
   //TODO: Add query
   /*
   log.info(

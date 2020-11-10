@@ -86,8 +86,8 @@ class AwsS3Service(cacheService: CacheService) extends AbstractService {
 
               this.cacheService.writeCachedAwsFileInfos(ans) match {
                 case Failure(exception) =>
-                  log.error(s"Error in writeCachedAwsFileInfos (${exception.getLocalizedMessage})")
-                case Success(filePath) => log.info(s"WriteCachedAwsFileInfos success ($filePath)")
+                  log.error(s"Error in write cache (${exception.getLocalizedMessage})")
+                case Success(filePath) => log.info(s"Write cache success ($filePath)")
               }
 
               ans
