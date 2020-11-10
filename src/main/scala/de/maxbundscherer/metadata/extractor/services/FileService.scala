@@ -22,7 +22,7 @@ class FileService() extends ConfigurationHelper with JsonHelper {
     Try {
       val jsonData: String =
         File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
-      Json.convertAwsFileInfosFromJSON(jsonData) match {
+      Json.AwsS3.convertFileInfosFromJson(jsonData) match {
         case Failure(exception) => throw exception
         case Success(fileKeys)  => fileKeys
       }
@@ -35,7 +35,7 @@ class FileService() extends ConfigurationHelper with JsonHelper {
     */
   def writeCachedAwsFileInfos(data: Vector[AwsS3Aggregate.FileInfo]): Try[String] =
     Try {
-      Json.convertAwsFileInfosToJSON(data) match {
+      Json.AwsS3.convertFileInfosToJson(data) match {
         case Failure(exception) => throw exception
         case Success(jsonContent) =>
           File(s"${Config.Global.cacheDirectory}")
