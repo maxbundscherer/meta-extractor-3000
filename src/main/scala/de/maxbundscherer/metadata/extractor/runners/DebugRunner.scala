@@ -7,11 +7,14 @@ class DebugRunner(awsS3Service: AwsS3Service) extends AbstractRunner(awsS3Servic
   import scala.util.{ Failure, Success }
 
   override def run: Unit = {
+    log.info("# DebugRunner init")
+    log.info("# Get buckets from s3")
     this.awsS3Service.getBuckets match {
       case Failure(exception) =>
         log.error(s"Error in getBuckets (${exception.getLocalizedMessage})")
       case Success(buckets) => buckets.foreach(b => log.info(s"Get bucket '${b.name}' from aws"))
     }
+    log.info("# Get fileInfosFromS3")
     this.awsS3Service
       .getFileInfos(useCache = true, bucketName = Config.AwsClients.S3.bucketName) match {
       case Failure(exception) =>
