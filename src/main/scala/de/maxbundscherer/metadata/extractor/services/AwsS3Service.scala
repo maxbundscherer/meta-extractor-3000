@@ -27,8 +27,6 @@ class AwsS3Service(cacheService: CacheService) extends AbstractService {
       .build()
   }
 
-  log.debug("AwsS3Service started")
-
   /**
     * Get Buckets from s3
     * @return Buckets
