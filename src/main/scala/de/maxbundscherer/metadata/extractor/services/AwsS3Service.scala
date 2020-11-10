@@ -2,7 +2,7 @@ package de.maxbundscherer.metadata.extractor.services
 
 import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, LoggingHelper }
 
-class AwsS3Service(fileService: FileService) extends ConfigurationHelper with LoggingHelper {
+class AwsS3Service(cacheService: CacheService) extends ConfigurationHelper with LoggingHelper {
 
   import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
 
@@ -59,7 +59,7 @@ class AwsS3Service(fileService: FileService) extends ConfigurationHelper with Lo
     val cache: Option[Vector[AwsS3Aggregate.FileInfo]] =
       if (!useCache) None
       else
-        this.fileService.getCachedAwsFileInfos match {
+        this.cacheService.getCachedAwsFileInfos match {
           case Failure(exception) =>
             log.warn(s"Cache read getFileInfos exception (${exception.getLocalizedMessage})")
             None
@@ -88,7 +88,7 @@ class AwsS3Service(fileService: FileService) extends ConfigurationHelper with Lo
 
               val ans = summaries.map(s => AwsS3Aggregate.FileInfo(s.getKey, s.getSize))
 
-              this.fileService.writeCachedAwsFileInfos(ans) match {
+              this.cacheService.writeCachedAwsFileInfos(ans) match {
                 case Failure(exception) =>
                   log.error(s"Error in writeCachedAwsFileInfos (${exception.getLocalizedMessage})")
                 case Success(filePath) => log.info(s"WriteCachedAwsFileInfos success ($filePath)")

@@ -2,7 +2,7 @@ package de.maxbundscherer.metadata.extractor.services
 
 import de.maxbundscherer.metadata.extractor.utils.{ ConfigurationHelper, JsonHelper }
 
-class FileService() extends ConfigurationHelper with JsonHelper {
+class CacheService() extends ConfigurationHelper with JsonHelper {
 
   import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
 
