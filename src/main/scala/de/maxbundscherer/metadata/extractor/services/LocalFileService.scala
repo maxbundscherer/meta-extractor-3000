@@ -43,7 +43,12 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
             this
               .recursiveListFiles(dir)
               .toVector
-              .map(f => LocalAggregate.FileInfo(filePath = f.getAbsolutePath))
+              .map(f =>
+                LocalAggregate.FileInfo(
+                  filePath = f.getAbsolutePath,
+                  fileKey = f.getCanonicalPath
+                )
+              )
           }
           this.cacheService.writeCachedLocalFileInfos(ans) match {
             case Failure(exception) =>
