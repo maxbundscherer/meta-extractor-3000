@@ -28,7 +28,7 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
 
     //TODO: Implement getFileInfos local
     //TODO: Implement write to cache...
-    ???
+    Try(???)
   }
 
 }

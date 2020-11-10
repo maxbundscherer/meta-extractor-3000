@@ -1,8 +1,9 @@
 package de.maxbundscherer.metadata.extractor.runners
 
-import de.maxbundscherer.metadata.extractor.services.AwsS3Service
+import de.maxbundscherer.metadata.extractor.services.{ AwsS3Service, LocalFileService }
 
-class DebugRunner(awsS3Service: AwsS3Service) extends AbstractRunner(awsS3Service = awsS3Service) {
+class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService)
+    extends AbstractRunner(awsS3Service = awsS3Service) {
 
   import scala.util.{ Failure, Success }
 
@@ -11,15 +12,22 @@ class DebugRunner(awsS3Service: AwsS3Service) extends AbstractRunner(awsS3Servic
     log.info("# Get buckets from s3")
     this.awsS3Service.getBuckets match {
       case Failure(exception) =>
-        log.error(s"Error in getBuckets (${exception.getLocalizedMessage})")
+        log.error(s"Error in getBuckets (${exception.getLocalizedMessage}) from aws")
       case Success(buckets) => buckets.foreach(b => log.info(s"Get bucket '${b.name}' from aws"))
     }
-    log.info("# Get fileInfosFromS3")
+    log.info("# Get fileInfos from s3")
     this.awsS3Service
       .getFileInfos(useCache = true, bucketName = Config.AwsClients.S3.bucketName) match {
       case Failure(exception) =>
-        log.error(s"Error in getFileInfos (${exception.getLocalizedMessage})")
+        log.error(s"Error in getFileInfos (${exception.getLocalizedMessage}) from aws")
       case Success(fileInfos) => log.info(s"Loaded ${fileInfos.length} fileInfos from aws")
+    }
+    log.info("# Get fileInfos from local dir")
+    this.localFileService
+      .getFileInfos(useCache = true) match {
+      case Failure(exception) =>
+        log.error(s"Error in getFileInfos (${exception.getLocalizedMessage}) from local dir")
+      case Success(fileInfos) => log.info(s"Loaded ${fileInfos.length} fileInfos from local dir")
     }
   }
 
