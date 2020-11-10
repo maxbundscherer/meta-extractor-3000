@@ -10,16 +10,17 @@ class DebugRunner(awsS3Service: AwsS3Service) extends AbstractRunner(awsS3Servic
     this.awsS3Service.getBuckets match {
       case Failure(exception) =>
         log.error(s"Error in getBuckets (${exception.getLocalizedMessage})")
-      case Success(buckets) => buckets.foreach(b => log.info(s"Get bucket '${b.name}'"))
+      case Success(buckets) => buckets.foreach(b => log.info(s"Get bucket '${b.name}' from aws"))
     }
     this.awsS3Service
       .getFileInfos(useCache = true, bucketName = Config.AwsClients.S3.bucketName) match {
       case Failure(exception) =>
         log.error(s"Error in getFileInfos (${exception.getLocalizedMessage})")
-      case Success(fileInfos) => log.info(s"Loaded ${fileInfos.length} items")
+      case Success(fileInfos) => log.info(s"Loaded ${fileInfos.length} fileInfos from aws")
     }
   }
 
+  //TODO: Add local file reader!
   //TODO: Add query
   /*
   log.info(
