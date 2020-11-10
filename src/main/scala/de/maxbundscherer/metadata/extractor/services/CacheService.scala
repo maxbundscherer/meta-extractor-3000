@@ -13,22 +13,41 @@ class CacheService() extends AbstractService with JsonHelper {
   import java.io.{ File => JFile }
   import scala.util.{ Failure, Success }
 
-  private val cachedAwsFileInfosFilename: String = "aws_fileInfos.json"
+  private val cachedAwsFileInfosFilename: String   = "aws_fileInfos.json"
+  private val cachedLocalFileInfosFilename: String = "local_fileInfos.json"
 
-  //TODO: Implement
   /**
     * Get file info from cache
     * @return FileInfos
     */
-  def getCachedLocalFileInfos: Try[Vector[LocalAggregate.FileInfo]] = ???
+  def getCachedLocalFileInfos: Try[Vector[LocalAggregate.FileInfo]] =
+    Try {
+      val jsonData: String =
+        File(s"${Config.Global.cacheDirectory}$cachedLocalFileInfosFilename").contentAsString
+      Json.Local.convertFileInfosFromJson(jsonData) match {
+        case Failure(exception) => throw exception
+        case Success(fileKeys)  => fileKeys
+      }
+    }
 
-  //TODO: Implement
   /**
     * Write file info to cache
     * @param data FileInfos
     * @return Try with filePath
     */
-  def writeCachedLocalFileInfos(data: Vector[LocalAggregate.FileInfo]): Try[String] = ???
+  def writeCachedLocalFileInfos(data: Vector[LocalAggregate.FileInfo]): Try[String] =
+    Try {
+      Json.Local.convertFileInfosToJson(data) match {
+        case Failure(exception) => throw exception
+        case Success(jsonContent) =>
+          File(s"${Config.Global.cacheDirectory}")
+            .createDirectoryIfNotExists()
+          File(s"${Config.Global.cacheDirectory}$cachedLocalFileInfosFilename")
+            .createFileIfNotExists()
+            .write(jsonContent)
+            .pathAsString
+      }
+    }
 
   /**
     * Get file info from cache
