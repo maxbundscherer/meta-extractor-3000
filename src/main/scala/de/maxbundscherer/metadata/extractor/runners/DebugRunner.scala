@@ -49,17 +49,47 @@ class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService
     val localFileKeys = localFileInfos.map(_.fileKey)
     val awsFileKeys   = awsFileInfos.map(_.fileKey)
 
-    log.info("# -- Count only local files")
-    val onlyLocal = localFileKeys.diff(awsFileKeys)
-    log.info("Only local: " + onlyLocal.length)
+    def singleQuery(
+        queryName: String,
+        fileKeyFilterIsLike: Option[String],
+        rawAwsFileKeys: Vector[String],
+        rawLocalFileKeys: Vector[String]
+    ): Unit = {
 
-    log.info("# -- Count only files on aws")
-    val onlyAws = awsFileKeys.diff(localFileKeys)
-    log.info("Only on aws: " + onlyAws.length)
+      val dAws = fileKeyFilterIsLike match {
+        case Some(filterC) => rawAwsFileKeys.filter(_.contains(filterC))
+        case None          => rawAwsFileKeys
+      }
+      val dLocal = fileKeyFilterIsLike match {
+        case Some(filterC) => rawLocalFileKeys.filter(_.contains(filterC))
+        case None          => rawLocalFileKeys
+      }
 
-    log.info("# -- Count both")
-    val both = awsFileKeys.intersect(localFileKeys)
-    log.info("Only on aws: " + both.length)
+      val onlyLocal = dLocal.diff(dAws)
+      log.info(s"($queryName) Only local files: " + onlyLocal.length)
+
+      val onlyAws = dAws.diff(dLocal)
+      log.info(s"($queryName) Only files on aws: " + onlyAws.length)
+
+      val both = dAws.intersect(dLocal)
+      log.info(s"($queryName) Files on both systems " + both.length)
+    }
+
+    log.info("## Query")
+    singleQuery(
+      queryName = "query-all-files",
+      fileKeyFilterIsLike = None,
+      rawAwsFileKeys = awsFileKeys,
+      rawLocalFileKeys = localFileKeys
+    )
+
+    log.info("## Query")
+    singleQuery(
+      queryName = "query-json-files",
+      fileKeyFilterIsLike = Some("json"),
+      rawAwsFileKeys = awsFileKeys,
+      rawLocalFileKeys = localFileKeys
+    )
 
   }
 
