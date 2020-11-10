@@ -46,7 +46,7 @@ class LocalFileService(cacheService: CacheService) extends AbstractService with 
               .map(f =>
                 LocalAggregate.FileInfo(
                   filePath = f.getAbsolutePath,
-                  fileKey = f.getCanonicalPath
+                  fileKey = f.getAbsolutePath.replace(Config.Runners.DebugRunner.localWorkDir, "")
                 )
               )
           }
