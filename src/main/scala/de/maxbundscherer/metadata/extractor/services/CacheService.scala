@@ -5,6 +5,7 @@ import de.maxbundscherer.metadata.extractor.utils.JsonHelper
 class CacheService() extends AbstractService with JsonHelper {
 
   import de.maxbundscherer.metadata.extractor.aggregates.AwsS3Aggregate
+  import de.maxbundscherer.metadata.extractor.aggregates.LocalAggregate
 
   import com.amazonaws.services.s3.model.S3ObjectSummary
   import scala.util.Try
@@ -13,6 +14,21 @@ class CacheService() extends AbstractService with JsonHelper {
   import scala.util.{ Failure, Success }
 
   private val cachedAwsFileInfosFilename: String = "aws_fileInfos.json"
+
+  //TODO: Implement
+  /**
+    * Get file info from cache
+    * @return FileInfos
+    */
+  def getCachedLocalFileInfos: Try[Vector[LocalAggregate.FileInfo]] = ???
+
+  //TODO: Implement
+  /**
+    * Write file info to cache
+    * @param data FileInfos
+    * @return Try with filePath
+    */
+  def writeCachedLocalFileInfos(data: Vector[LocalAggregate.FileInfo]): Try[String] = ???
 
   /**
     * Get file info from cache
