@@ -16,5 +16,5 @@ object Main extends App with ConfigurationHelper with LoggingHelper {
 
   runner.run
 
-  log.info(s"Application ended (${Config.Global.message})")
+  log.info(s"Application ended")
 }
