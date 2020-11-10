@@ -12,7 +12,7 @@ class FileService() extends ConfigurationHelper with JsonHelper {
   import java.io.{ File => JFile }
   import scala.util.{ Failure, Success }
 
-  private val fileKeysFilename: String = "aws_fileInfos.json"
+  private val cachedAwsFileInfosFilename: String = "aws_fileInfos.json"
 
   /**
     * Get file info from cache
@@ -21,7 +21,7 @@ class FileService() extends ConfigurationHelper with JsonHelper {
   def getCachedAwsFileInfos: Try[Vector[AwsS3Aggregate.FileInfo]] =
     Try {
       val jsonData: String =
-        File(s"${Config.Global.cacheDirectory}$fileKeysFilename").contentAsString
+        File(s"${Config.Global.cacheDirectory}$cachedAwsFileInfosFilename").contentAsString
       Json.AwsS3.convertFileInfosFromJson(jsonData) match {
         case Failure(exception) => throw exception
         case Success(fileKeys)  => fileKeys
@@ -40,7 +40,7 @@ class FileService() extends ConfigurationHelper with JsonHelper {
         case Success(jsonContent) =>
           File(s"${Config.Global.cacheDirectory}")
             .createDirectoryIfNotExists()
-          File(s"${Config.Global.cacheDirectory}$fileKeysFilename")
+          File(s"${Config.Global.cacheDirectory}$cachedAwsFileInfosFilename")
             .createFileIfNotExists()
             .write(jsonContent)
             .pathAsString
