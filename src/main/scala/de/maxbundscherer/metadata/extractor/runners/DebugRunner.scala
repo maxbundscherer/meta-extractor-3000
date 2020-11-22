@@ -49,12 +49,20 @@ class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService
     val localFileKeys = localFileInfos.map(_.fileKey)
     val awsFileKeys   = awsFileInfos.map(_.fileKey)
 
+    /**
+      * Single query
+      * @param queryName
+      * @param fileKeyFilterIsLike
+      * @param rawAwsFileKeys
+      * @param rawLocalFileKeys
+      * @return intersect
+      */
     def singleQuery(
         queryName: String,
         fileKeyFilterIsLike: Option[String],
         rawAwsFileKeys: Vector[String],
         rawLocalFileKeys: Vector[String]
-    ): Unit = {
+    ): Vector[String] = {
 
       val dAws = fileKeyFilterIsLike match {
         case Some(filterC) => rawAwsFileKeys.filter(_.contains(filterC))
@@ -73,10 +81,11 @@ class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService
 
       val both = dAws.intersect(dLocal)
       log.info(s"($queryName) Files on both systems " + both.length)
+      both
     }
 
     log.info("## Query")
-    singleQuery(
+    val both = singleQuery(
       queryName = "query-all-files",
       fileKeyFilterIsLike = None,
       rawAwsFileKeys = awsFileKeys,
@@ -90,6 +99,24 @@ class DebugRunner(awsS3Service: AwsS3Service, localFileService: LocalFileService
       rawAwsFileKeys = awsFileKeys,
       rawLocalFileKeys = localFileKeys
     )
+
+    log.info("## Get FileEndings")
+    val fileEndings = both
+      .map { i =>
+        val d: Array[String] = i.split('.')
+        if (d.isEmpty) "error" else if (d.length != 2) "noEnding" else d.last //TODO: Improve filter
+      }
+
+    log.info(s"Got ${fileEndings.count(_.eq("error"))} errors in fileEndings")
+    log.info(s"Got ${fileEndings.count(!_.eq("error"))} success in fileEndings")
+
+    val t: Map[String, Vector[String]] = fileEndings.filter(!_.eq("error")).groupBy(i => i)
+
+    t.keys
+      .map(key => (key, t(key).size))
+      .toVector
+      .sortBy(_._2 * -1)
+      .foreach(fileEnding => log.info(s"Got fileEnding (${fileEnding._1}) ${fileEnding._2} times"))
 
   }
 
